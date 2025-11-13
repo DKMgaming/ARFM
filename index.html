@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Widget & OpenStreetMap Intersection</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+    <style>
+        /* CSS Variables cho Chat (Giống Messenger) */
+        :root {
+            --chat--color-primary: #007bff;
+            --chat--color-primary-shade-50: #0069d9;
+            --chat--color-secondary: #0084ff;
+            --chat--color-light: #f5f6f7;
+            --chat--color-dark: #1c1c1c;
+            --chat--border-radius: 1.5rem;
+            --chat--window--border-radius: 0.75rem;
+            --chat--window--width: 350px;
+            --chat--window--height: 600px;
+            --chat--button--border-radius: 2rem;
+            --chat--header--background: #0084ff;
+            --chat--header--color: #ffffff;
+            --chat--header--padding: 0.8rem 1rem;
+            --chat--heading--font-size: 1em;
+            --chat--subtitle--font-size: 0.8em;
+            --chat--message--padding: 0.75rem 1rem;
+            --chat--message--bot--background: #f5f6f7;
+            --chat--message--bot--color: var(--chat--color-dark);
+            --chat--message--user--background: #0084ff;
+            --chat--message--user--color: #ffffff;
+            --chat--message-user-border-radius: 1.5rem 1.5rem 0.3rem 1.5rem;
+            --chat--message-bot-border-radius: 1.5rem 1.5rem 1.5rem 0.3rem;
+            --chat--message--box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            --chat--textarea--height: 40px;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0; /* Đảm bảo không có margin mặc định */
+            padding: 0;
+        }
+
+        /* CSS cho Map */
+        #map {
+            height: 80vh; /* Chiều cao cho bản đồ */
+            width: 100%;
+        }
+        #controls {
+            padding: 15px;
+            background-color: #f8f8f8;
+            border-bottom: 1px solid #eee;
+        }
+        #controls label, #controls input, #controls button {
+            margin-right: 10px;
+            margin-bottom: 5px;
+            display: inline-block;
+        }
+
+        /* CSS cho Ray và Intersection */
+        .selected {
+            color: blue;
+            font-weight: bold;
+        }
+        .intersection {
+            background-color: black;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .chat-container {
+            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1);
+        }
+
+        .chat-message {
+            box-shadow: var(--chat--message--box-shadow);
+        }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <h2>Công cụ Tính toán Giao điểm (Intersection)</h2>
+        <label for="latitude">Latitude (Vĩ độ): </label>
+        <input type="text" id="latitude" placeholder="Nhập vĩ độ"><br>
+        <label for="longitude">Longitude (Kinh độ): </label>
+        <input type="text" id="longitude" placeholder="Nhập kinh độ"><br>
+        <label for="azimuth">Azimuth (Góc phương vị - độ): </label>
+        <input type="text" id="azimuth" placeholder="Nhập góc phương vị"><br>
+        <label for="distance">Distance (Khoảng cách - mét): </label>
+        <input type="text" id="distance" placeholder="Nhập khoảng cách"><br>
+        <button id="addRay">Thêm Tia (Ray)</button>
+        <button id="calculateIntersection">Tính toán Giao điểm</button>
+        <button id="removeSelectedRays">Xóa Tia đã chọn</button>
+        <br><br>
+        <label for="fileInput">Tải Tia từ Excel: </label>
+        <input type="file" id="fileInput" accept=".xlsx, .xls">
+    </div>
+
+    <div id="map"></div>
+
+    <div id="n8n-chat"></div>
+
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <script src="https://unpkg.com/leaflet-ellipse/dist/leaflet-ellipse.js"></script>
+    <script src="script.js"></script>
+
+
+    <script type="module">
+        import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+
+        createChat({
+            webhookUrl: 'https://n8nhosting-25481040.phoai.vn/webhook/f97bd6e7-20c7-4149-a802-d7d23ab6d363/chat',
+            initialMessages: [
+                'Chào bạn! 👋',
+                'Chúng tôi có thể giúp gì cho bạn hôm nay?'
+            ],
+            showWelcomeScreen: false,
+            i18n: {
+                en: {
+                    title: 'Trò chuyện với chúng tôi',
+                    subtitle: 'Chúng tôi sẵn lòng hỗ trợ bạn 24/7.',
+                    footer: '',
+                    getStarted: 'Bắt đầu trò chuyện',
+                    inputPlaceholder: 'Nhập tin nhắn...',
+                },
+            }
+        });
+    </script>
+</body>
+</html>
